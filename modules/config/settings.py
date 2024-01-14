@@ -54,4 +54,4 @@ ACCESS_TOKEN_EXPIRE_DAYS = 7
 HTTP_ADDR = 'http://localhost'
 HTTP_PORT = 9100
 HTTP_SITE = f'{HTTP_ADDR}:{HTTP_PORT}'
-DEFAULT_AVATAR = f'/static/avatar/default.jpg'
+DEFAULT_AVATAR_PATH = f'/static/avatar'
