@@ -28,7 +28,17 @@ REDIS_PASS = env('REDIS_PASS')
 REDIS_DB = env('REDIS_DB')
 REDIS_URL = f"redis://{REDIS_USER}:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}?encoding=utf-8"
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# to get a string like this run:
+# openssl rand -hex 32
+SECRET_KEY = env('SECRET_KEY', default='secret')
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_DAYS = 7
+
+HTTP_ADDR = 'http://localhost'
+HTTP_PORT = 26798
+HTTP_SITE = f'{HTTP_ADDR}:{HTTP_PORT}'
+DEFAULT_AVATAR_PATH = f'/static/avatar'
 
 TORTOISE_ORM = {
     "connections": {"default": DB_URL},
@@ -36,22 +46,11 @@ TORTOISE_ORM = {
         "models": {
             "models": [
                 'aerich.models',
-                'common.models',
-                'user.models',
-                'article.models',
+                'modules.common.models',
+                'modules.user.models',
+                'modules.communication.models',
             ],
             "default_connection": "default",
         },
     },
 }
-
-# to get a string like this run:
-# openssl rand -hex 32
-SECRET_KEY = env('SECRET_KEY')
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_DAYS = 7
-
-HTTP_ADDR = 'http://localhost'
-HTTP_PORT = 9100
-HTTP_SITE = f'{HTTP_ADDR}:{HTTP_PORT}'
-DEFAULT_AVATAR = f'/static/avatar/default.jpg'

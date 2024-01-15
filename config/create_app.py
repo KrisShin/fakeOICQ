@@ -1,11 +1,12 @@
 import os
 
-from config.settings import BASE_DIR, REDIS_URL, TORTOISE_ORM
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from redis import asyncio
 from tortoise.contrib.fastapi import register_tortoise
+
+from config.settings import BASE_DIR, REDIS_URL, TORTOISE_ORM
 
 
 def register_redis(app: FastAPI):
