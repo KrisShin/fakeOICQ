@@ -1,7 +1,7 @@
-from common.models import BaseModel
+from modules.message.pydantics import MessageType
 from tortoise import fields
 
-from modules.message.pydantics import MessageType
+from modules.common.models import BaseModel
 
 
 class Notification(BaseModel):

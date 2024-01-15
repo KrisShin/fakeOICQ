@@ -1,5 +1,6 @@
-from common.models import BaseModel
 from tortoise import fields
+
+from modules.common.models import BaseModel
 
 
 class Group(BaseModel):

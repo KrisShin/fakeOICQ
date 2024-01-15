@@ -5,8 +5,7 @@ import time
 from datetime import timedelta
 
 from config.create_app import app
-
-from modules.config.settings import TIME_NS
+from config.settings import TIME_NS
 
 
 def generate_random_id(count: int = 32) -> str:
