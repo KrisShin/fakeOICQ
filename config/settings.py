@@ -30,21 +30,6 @@ REDIS_URL = f"redis://{REDIS_USER}:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/{REDIS
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-TORTOISE_ORM = {
-    "connections": {"default": DB_URL},
-    "apps": {
-        "models": {
-            "models": [
-                'aerich.models',
-                'common.models',
-                'user.models',
-                'article.models',
-            ],
-            "default_connection": "default",
-        },
-    },
-}
-
 # to get a string like this run:
 # openssl rand -hex 32
 SECRET_KEY = env('SECRET_KEY')
@@ -55,3 +40,17 @@ HTTP_ADDR = 'http://localhost'
 HTTP_PORT = 9100
 HTTP_SITE = f'{HTTP_ADDR}:{HTTP_PORT}'
 DEFAULT_AVATAR_PATH = f'/static/avatar'
+
+TORTOISE_ORM = {
+    "connections": {"default": DB_URL},
+    "apps": {
+        "models": {
+            "models": [
+                'aerich.models',
+                'modules.common.models',
+                'modules.user.models',
+            ],
+            "default_connection": "default",
+        },
+    },
+}

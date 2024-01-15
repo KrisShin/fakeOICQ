@@ -23,6 +23,7 @@ class Message(BaseModel):
         return self.title
 
 
+# TODO
 class Communication(BaseModel):
     """
     communication
