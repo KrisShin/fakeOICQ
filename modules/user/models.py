@@ -9,7 +9,6 @@ class User(BaseModel):
     phone = fields.CharField(max_length=16, unique=True)
     password = fields.CharField(max_length=128)
     avatar = fields.CharField(max_length=255, null=True, default='default.jpg')
-    contact_users = fields.ForeignKeyField('models.ContactUser', related_name='users')
 
     tags = fields.ManyToManyField(
         "models.Tag", through="relate_user_tag", related_name="users"
