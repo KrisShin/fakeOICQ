@@ -28,7 +28,7 @@ class Communication(BaseModel):
     communication
     """
 
-    latest_message = fields.ForeignKeyField('models.Message', related_name='+')
+    latest_message = fields.ForeignKeyField('models.Message', null=True)
     has_history = fields.BooleanField(default=False)
     new_count = fields.IntField(default=0)
 

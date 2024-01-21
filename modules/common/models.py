@@ -19,7 +19,6 @@ class Tag(BaseModel):
 
     key = fields.CharField(max_length=128, null=False, unique=True, index=True)
     description = fields.TextField(null=True)
-    # group = fields.ManyToManyField("models.Group", through="relate_group_tag")
 
     class Meta:
         table = "tb_tag"

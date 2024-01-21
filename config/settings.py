@@ -1,6 +1,8 @@
 import os
+from typing import Type
 
 from environ import Env
+from tortoise.models import Model
 
 env = Env(DEBUG=(bool, False))
 
@@ -40,8 +42,29 @@ HTTP_PORT = 26798
 HTTP_SITE = f'{HTTP_ADDR}:{HTTP_PORT}'
 DEFAULT_AVATAR_PATH = f'/static/avatar'
 
+
+class Router:
+    def db_for_read(self, model: Type[Model]):
+        return "slave"
+
+    def db_for_write(self, model: Type[Model]):
+        return "master"
+
+
 TORTOISE_ORM = {
-    "connections": {"default": DB_URL},
+    "connections": {
+        # Dict format for connection
+        'default': {
+            'engine': 'tortoise.backends.asyncpg',
+            'credentials': {
+                'host': PG_HOST,
+                'port': PG_PORT,
+                'user': PG_USER,
+                'password': PG_PASS,
+                'database': PG_DB,
+            },
+        }
+    },
     "apps": {
         "models": {
             "models": [
@@ -53,4 +76,6 @@ TORTOISE_ORM = {
             "default_connection": "default",
         },
     },
+    "use_tz": False,
+    "timezone": "UTC",
 }
