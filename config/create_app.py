@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from redis import asyncio
 from tortoise.contrib.fastapi import register_tortoise
 
-from config.settings import BASE_DIR, DEBUG, REDIS_URL, TORTOISE_ORM
+from config.settings import BASE_DIR, DEBUG, HTTP_PORT, REDIS_URL, TORTOISE_ORM
 
 
 def register_redis(app: FastAPI):
@@ -50,7 +50,7 @@ def create_app():
     )
     origins = [
         "http://localhost",
-        "http://localhost:19988",
+        "http://localhost:" + HTTP_PORT,
     ]
 
     app.add_middleware(
