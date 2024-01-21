@@ -33,7 +33,9 @@ CREATE TABLE IF NOT EXISTS "tb_user" (
     "nickname" VARCHAR(32) NOT NULL,
     "username" VARCHAR(64) NOT NULL UNIQUE,
     "phone" VARCHAR(16) NOT NULL UNIQUE,
+    "email" VARCHAR(255)  UNIQUE,
     "password" VARCHAR(128) NOT NULL,
+    "disabled" BOOL NOT NULL  DEFAULT False,
     "avatar" VARCHAR(255)   DEFAULT 'default.jpg'
 );
 CREATE TABLE IF NOT EXISTS "tb_communication" (

@@ -7,12 +7,14 @@ class User(BaseModel):
     nickname = fields.CharField(max_length=32)
     username = fields.CharField(max_length=64, unique=True)
     phone = fields.CharField(max_length=16, unique=True)
+    email = fields.CharField(max_length=255, null=True, unique=True)
     password = fields.CharField(max_length=128)
+    disabled = fields.BooleanField(default=False)
     avatar = fields.CharField(max_length=255, null=True, default='default.jpg')
 
-    # tags = fields.ManyToManyField(
-    #     "models.Tag", through="relate_user_tag", related_name="users"
-    # )
+    tags = fields.ManyToManyField(
+        "models.Tag", through="relate_user_tag", related_name="users"
+    )
 
     class Meta:
         ordering = ['nickname']

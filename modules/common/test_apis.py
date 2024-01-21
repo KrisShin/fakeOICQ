@@ -1,5 +1,6 @@
 import random
 import string
+
 from fastapi import APIRouter, Response
 
 from modules.common.models import Tag
@@ -15,9 +16,7 @@ async def prepare_tags():
     """
     Add default tags.
     """
-    t = Tag(key='123', description='123')
-    await t.save()
-    await Tag.create(key='123', description='123')
+
     tags = []
     for t in [
         'cool',
@@ -32,7 +31,7 @@ async def prepare_tags():
     ]:
         x = await Tag.create(key=t, description=t)
         tags.append(x)
-    return Response(content='')
+    return Response()
 
 
 @router.get("/tester")
@@ -46,22 +45,20 @@ async def prepare_tester():
         users.append(
             await User.create(
                 username=u,
-                nickname=u,
+                nickname='nickname_' + u,
                 password=get_password_hash('123123'),
-                phone='131234' + random.choices(string.digits, k=5),
+                phone='131234' + ''.join(random.choices(string.digits, k=5)),
             )
         )
     test1, test2 = users
 
     # add to contacts
     communication = await Communication.create()
-    contact1 = await ContactUser.create(
-        me=test1, contact=test2, communication=communication
+    await ContactUser.create(
+        name=test2.nickname, me=test1, contact=test2, communication=communication
     )
-    test1.contact_users.add(contact1)
-    await test1.save()
-    contact2 = await ContactUser.create(
-        me=test2, contact=test1, communication=communication
+
+    await ContactUser.create(
+        name=test1.nickname, me=test2, contact=test1, communication=communication
     )
-    test2.contact_users.add(contact2)
-    await test2.save()
+    return Response(content='success')
