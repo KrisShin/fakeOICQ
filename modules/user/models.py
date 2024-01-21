@@ -10,9 +10,9 @@ class User(BaseModel):
     password = fields.CharField(max_length=128)
     avatar = fields.CharField(max_length=255, null=True, default='default.jpg')
 
-    tags = fields.ManyToManyField(
-        "models.Tag", through="relate_user_tag", related_name="users"
-    )
+    # tags = fields.ManyToManyField(
+    #     "models.Tag", through="relate_user_tag", related_name="users"
+    # )
 
     class Meta:
         ordering = ['nickname']

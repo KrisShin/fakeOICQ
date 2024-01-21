@@ -14,16 +14,14 @@ def register_router(app: FastAPI):
 
     Tortoise.init_models(
         [
-            'modules.common.models',
-            'modules.user.models',
-            'modules.communication.models',
+            'modules.common.models'
         ],
         'models',
     )
 
     app.include_router(
         test_router,
-        tags=['tag'],
+        tags=['test'],
         responses={404: {'description': 'Not Found'}},
         prefix="/api/test",
     )

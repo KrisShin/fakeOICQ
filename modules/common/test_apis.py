@@ -15,6 +15,9 @@ async def prepare_tags():
     """
     Add default tags.
     """
+    t = Tag(key='123', description='123')
+    await t.save()
+    await Tag.create(key='123', description='123')
     tags = []
     for t in [
         'cool',
@@ -27,9 +30,9 @@ async def prepare_tags():
         'finance',
         'geography',
     ]:
-        x = await Tag.create(key=t)
+        x = await Tag.create(key=t, description=t)
         tags.append(x)
-    return Response(content=tags)
+    return Response(content='')
 
 
 @router.get("/tester")
