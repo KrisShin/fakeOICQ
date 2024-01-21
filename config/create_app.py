@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from redis import asyncio
 from tortoise.contrib.fastapi import register_tortoise
 
-from config.settings import BASE_DIR, REDIS_URL, TORTOISE_ORM
+from config.settings import BASE_DIR, DEBUG, REDIS_URL, TORTOISE_ORM
 
 
 def register_redis(app: FastAPI):
@@ -40,7 +40,10 @@ def init_db(app):
 
 
 def create_app():
-    app = FastAPI()
+    if DEBUG:
+        app = FastAPI()
+    else:
+        app = FastAPI(docs_url=None, redoc_url=None)
     app.mount(
         "/static",
         StaticFiles(directory=os.path.join(BASE_DIR, "statics")),

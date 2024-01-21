@@ -12,7 +12,7 @@ Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 DEBUG = env("DEBUG")
 
-TIME_NS = 19
+TIME_NS = 16
 
 PG_HOST = env('PG_HOST')
 PG_PORT = env('PG_PORT')
