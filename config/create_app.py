@@ -14,18 +14,17 @@ def register_redis(app: FastAPI):
     register redis to app
     """
 
-    # @app.lifespan("startup")
-    # async def startup_event():
-    #     app.redis = await asyncio.from_url(
-    #         REDIS_URL,
-    #         decode_responses=True,
-    #         encoding="utf8",
-    #     )
+    @app.lifespan("startup")
+    async def startup_event():
+        app.redis = await asyncio.from_url(
+            REDIS_URL,
+            decode_responses=True,
+            encoding="utf8",
+        )
 
-    # @app.on_event("shutdown")
-    # async def shutdown_event():
-    #     app.redis.close()
-    ...
+    @app.lifespan("shutdown")
+    async def shutdown_event():
+        app.redis.close()
 
 
 def init_db(app):

@@ -20,12 +20,12 @@ def register_router(app: FastAPI):
         'models',
     )
 
-    # app.include_router(
-    #     test_router,
-    #     tags=['test'],
-    #     responses={404: {'description': 'Not Found'}},
-    #     prefix="/api/test",
-    # )
+    app.include_router(
+        test_router,
+        tags=['test'],
+        responses={404: {'description': 'Not Found'}},
+        prefix="/api/test",
+    )
     # app.include_router(
     #     tag_router,
     #     tags=['tag'],
