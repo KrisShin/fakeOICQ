@@ -28,7 +28,8 @@ REDIS_PORT = env('REDIS_PORT')
 REDIS_USER = env('REDIS_USER')
 REDIS_PASS = env('REDIS_PASS')
 REDIS_DB = env('REDIS_DB')
-REDIS_URL = f"redis://{REDIS_USER}:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}?encoding=utf-8"
+REDIS_URL = f"redis://{REDIS_USER}:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
+CACHE_HEADER = 'oicq.cache.'
 
 
 # to get a string like this run:

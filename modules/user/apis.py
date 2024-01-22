@@ -56,8 +56,8 @@ async def post_user_token(
         return AuthenticationFailed('Wrong password')
     access_token_expires = timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
     token = create_access_token(user_id=user_obj.id, expires_delta=access_token_expires)
-    await del_cache(str(user_obj.id))
-    await set_cache(str(user_obj.id), token, access_token_expires)
+    # await del_cache(str(user_obj.id))
+    # await set_cache(str(user_obj.id), token, access_token_expires)
     resp = TokenPydantic(access_token=token)
     return resp
 

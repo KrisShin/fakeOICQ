@@ -5,7 +5,7 @@ import time
 from datetime import timedelta
 
 from config.create_app import app
-from config.settings import TIME_NS
+from config.settings import CACHE_HEADER, TIME_NS
 
 
 def generate_random_id(count: int = 32) -> str:
@@ -22,7 +22,7 @@ async def set_cache(key: str, value, ex: timedelta = None) -> bool:
     if not all((key, value)):
         return False
 
-    params = {'name': 'blog.cache.' + key, 'value': value}
+    params = {'name': CACHE_HEADER + key, 'value': value}
     if ex:
         params['ex'] = ex
 
@@ -37,8 +37,8 @@ async def set_cache(key: str, value, ex: timedelta = None) -> bool:
 
 
 async def get_cache(key: str) -> str:
-    return await app.redis.get('blog.cache.' + key)
+    return await app.redis.get(CACHE_HEADER + key)
 
 
 async def del_cache(key: str) -> str:
-    return await app.redis.delete('blog.cache.' + key)
+    return await app.redis.delete(CACHE_HEADER + key)
