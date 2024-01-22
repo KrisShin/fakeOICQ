@@ -3,6 +3,7 @@ import random
 import string
 import time
 from datetime import timedelta
+from pydantic import BaseModel
 
 from redis import asyncio
 
@@ -63,3 +64,7 @@ async def get_redis():
         REDIS_URL, decode_responses=True, encoding="utf8"
     )
     return redis_client
+
+
+def queryset_to_pydantic_model(queryset, model_class):
+    return [model_class.model_validate(item) for item in queryset]

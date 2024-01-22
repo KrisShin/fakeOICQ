@@ -4,7 +4,7 @@ from tortoise.contrib.pydantic import pydantic_model_creator
 from modules.user.models import ContactUser, User
 
 
-class UserLoginPydantic(BaseModel):
+class UserRegisterPydantic(BaseModel):
     username: str
     password: str
 
@@ -14,7 +14,7 @@ UserPydantic = pydantic_model_creator(User, name="UserPydantic")
 UserInfoPydantic = pydantic_model_creator(
     User,
     name="UserInfo",
-    exclude=('password', 'create_time', 'update_time', 'disabled'),
+    exclude=('password', 'create_time', 'update_time', 'disabled', 'avatar'),
 )
 ContactUserInfoPydantic = pydantic_model_creator(
     ContactUser,

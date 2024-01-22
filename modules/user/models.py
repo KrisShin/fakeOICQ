@@ -1,4 +1,5 @@
 from tortoise import fields
+from config.settings import DEFAULT_AVATAR_PATH, HTTP_ADDR, HTTP_SITE
 
 from modules.common.models import BaseModel
 
@@ -19,6 +20,10 @@ class User(BaseModel):
     class Meta:
         ordering = ['nickname']
         table = 'tb_user'
+
+    @property
+    def avatar_url(self):
+        return HTTP_SITE + DEFAULT_AVATAR_PATH + self.avatar
 
 
 class ContactUser(BaseModel):
