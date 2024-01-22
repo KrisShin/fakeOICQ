@@ -25,20 +25,38 @@ router = APIRouter()
 
 @router.post('/register/')
 async def post_register_user(user: UserRegisterPydantic):
+    """
+    regester user\n
+    @params:\n
+        username :str
+        password :str
+    @default phone None\n
+            nickname username :You can modify later.
+    """
     password_hash = get_password_hash(user.password)
     user_obj = await User.get_or_none(username=user.username)
     if not user_obj:
-        user_obj = await User.create(username=user.username, password=password_hash)
-        response_data = UserInfoPydantic.model_dump(user_obj)
+        user_obj = await User.create(
+            nickname=user.username,
+            username=user.username,
+            password=password_hash,
+        )
+        response_data = UserInfoPydantic.model_validate(user_obj)
         return response_data
     raise AuthenticationFailed('User already exist.')
 
 
 @router.post('/reset_password/')
 async def post_reset_password(username):
+    """
+    reset user's password to '123123'.\n
+    maybe just for test or just reset my password.\n
+    @params:\n
+        username :str will delete later.
+    """
     user_obj = await User.get_or_none(username=username)
     if user_obj:
-        password_hash = get_password_hash('test')
+        password_hash = get_password_hash('123123')
         user_obj.password = password_hash
         await user_obj.save()
         return TokenPydantic(access_token=create_access_token(user_obj.id))
@@ -84,6 +102,15 @@ async def get_contact_list(
     page_size: int = 10,
     user: User = Depends(get_current_user_model),
 ):
+    """
+    Get contact list/blacklist\n
+    @params:\n
+        is_block: str default False
+        offset: int page * page_size
+        page_size: int default 10
+    """
+    if is_block:
+        is_block = is_block.strip().lower() in ('true', '1', 't', 'yes')
     contact_list = (
         await ContactUser.filter(me=user)
         .filter(deleted_time=None, is_block=is_block)

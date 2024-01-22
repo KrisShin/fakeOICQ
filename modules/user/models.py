@@ -7,7 +7,7 @@ from modules.common.models import BaseModel
 class User(BaseModel):
     nickname = fields.CharField(max_length=32)
     username = fields.CharField(max_length=64, unique=True)
-    phone = fields.CharField(max_length=16, unique=True)
+    phone = fields.CharField(max_length=16, unique=True, null=True)
     email = fields.CharField(max_length=255, null=True, unique=True)
     password = fields.CharField(max_length=128)
     disabled = fields.BooleanField(default=False)
