@@ -4,8 +4,11 @@ import string
 import time
 from datetime import timedelta
 
+from redis import asyncio
+
 from config.create_app import app
-from config.settings import CACHE_HEADER, TIME_NS
+from config.settings import CACHE_HEADER, REDIS_URL, TIME_NS
+from modules.common.global_variable import redis_client
 
 
 def generate_random_id(count: int = 32) -> str:
@@ -26,19 +29,37 @@ async def set_cache(key: str, value, ex: timedelta = None) -> bool:
     if ex:
         params['ex'] = ex
 
+    global redis_client
+    redis_client = await get_redis()
     if isinstance(value, int | float | str):
-        return await app.redis.set(**params)
+        return await redis_client.set(**params)
     else:
         try:
             params['value'] = json.dumps(value)
-            return await app.redis.set(**params)
+            return await redis_client.set(**params)
         except json.JSONDecodeError:
             return False
 
 
 async def get_cache(key: str) -> str:
-    return await app.redis.get(CACHE_HEADER + key)
+    global redis_client
+    redis_client = await get_redis()
+    return await redis_client.get(CACHE_HEADER + key)
 
 
 async def del_cache(key: str) -> str:
-    return await app.redis.delete(CACHE_HEADER + key)
+    global redis_client
+    redis_client = await get_redis()
+    return await redis_client.delete(CACHE_HEADER + key)
+
+
+async def get_redis():
+    global redis_client
+    if redis_client:
+        pong = await redis_client.ping()
+        if pong:
+            return redis_client
+    redis_client = await asyncio.from_url(
+        REDIS_URL, decode_responses=True, encoding="utf8"
+    )
+    return redis_client

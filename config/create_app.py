@@ -1,25 +1,11 @@
-from contextlib import asynccontextmanager
 import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from redis import asyncio
 from tortoise.contrib.fastapi import register_tortoise
 
-from config.settings import BASE_DIR, DEBUG, HTTP_PORT, REDIS_URL, TORTOISE_ORM
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    app.redis = await asyncio.from_url(
-        REDIS_URL,
-        decode_responses=True,
-        encoding="utf8",
-    )
-    yield
-    app.redis.close()
-
+from config.settings import BASE_DIR, DEBUG, HTTP_PORT, TORTOISE_ORM
 
 # def register_redis(app: FastAPI):
 #     """

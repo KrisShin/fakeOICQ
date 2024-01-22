@@ -43,11 +43,11 @@ async def validate_token(token: str = Depends(oauth2_scheme)) -> str | bool:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("user_id")
         expire_time: float = payload.get('exp')
-        # saved_token = await get_cache(user_id)
+        saved_token = await get_cache(user_id)
         if (
             (user_id is None)
             or (datetime.fromtimestamp(expire_time) < datetime.utcnow())
-            # or (saved_token != token)
+            or (saved_token != token)
         ):
             return False
     except JWTError:
