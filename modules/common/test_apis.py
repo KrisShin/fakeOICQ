@@ -6,7 +6,7 @@ from fastapi import APIRouter, Response
 from modules.common.models import Tag
 from modules.communication.models import Communication
 from modules.user.models import ContactUser, User
-from modules.user.utils import get_password_hash
+from modules.user.utils import add_to_contacts, get_password_hash
 
 router = APIRouter()
 
@@ -64,18 +64,9 @@ async def prepare_tester():
     await _set_random_tags(t4, random.randint(1, 5))
 
     # add to contacts
-
-    async def _add_to_contacts(user: User, contacts: list[User]):
-        communication = await Communication.create()
-        await ContactUser.create(
-            name=contacts.nickname, me=user, contact=contacts, communication=communication
-        )
-        await ContactUser.create(
-            name=user.nickname, me=contacts, contact=user, communication=communication
-        )
-    await _add_to_contacts(t1, t2)
-    await _add_to_contacts(t1, t3)
-    await _add_to_contacts(t1, t4)
-    await _add_to_contacts(t2, t3)
-    await _add_to_contacts(t3, t4)
+    await add_to_contacts(t1, t2)
+    await add_to_contacts(t1, t3)
+    await add_to_contacts(t1, t4)
+    await add_to_contacts(t2, t3)
+    await add_to_contacts(t3, t4)
     return Response(content='success')

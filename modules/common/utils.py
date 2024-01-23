@@ -3,8 +3,8 @@ import random
 import string
 import time
 from datetime import timedelta
-from pydantic import BaseModel
 
+from pydantic import BaseModel
 from redis import asyncio
 
 from config.create_app import app

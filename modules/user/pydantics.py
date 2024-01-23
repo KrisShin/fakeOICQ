@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from tortoise.contrib.pydantic import pydantic_model_creator
 
-from modules.user.models import ContactUser, User
+from modules.user.models import ContactRequest, ContactUser, User
 
 
 class UserRegisterPydantic(BaseModel):
@@ -16,9 +16,15 @@ UserInfoPydantic = pydantic_model_creator(
     name="UserInfo",
     exclude=('password', 'create_time', 'update_time', 'disabled', 'avatar'),
 )
+
 ContactUserInfoPydantic = pydantic_model_creator(
     ContactUser,
     name="ContactUserInfo",
+)
+
+ContactRequestPydantic = pydantic_model_creator(
+    ContactRequest,
+    name="ContactRequestInfo",
 )
 
 
