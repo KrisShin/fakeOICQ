@@ -14,6 +14,13 @@ class BadRequest(HTTPException):
     def __init__(self, detail):
         self.detail = detail
 
+class NotFound(HTTPException):
+    status_code = status.HTTP_404_NOT_FOUND
+    detail = ''
+
+    def __init__(self, detail):
+        self.detail = detail
+
 
 class AuthenticationFailed(HTTPException):
     status_code = status.HTTP_401_UNAUTHORIZED

@@ -1,7 +1,21 @@
+from enum import IntEnum
+
 from tortoise import fields
 
 from modules.common.models import BaseModel
-from modules.communication.pydantics import MessageType
+
+
+class MessageType(IntEnum):
+    """
+    message type
+    """
+
+    TEXT = 1
+    IMAGE = 2
+    VEDIO = 3
+    LINK = 4
+    AUDIO = 5
+    FILE = 6
 
 
 class Message(BaseModel):
@@ -11,7 +25,9 @@ class Message(BaseModel):
 
     content = fields.TextField()
     # status = fields.IntField(default=0)  # 0未读 1已读
-    message_category = fields.IntEnumField(enum_type=MessageType)
+    message_category = fields.IntEnumField(
+        enum_type=MessageType, default=MessageType.TEXT.value
+    )
 
     contact_id = fields.CharField(max_length=32, index=True, null=False)
     communication_id = fields.CharField(max_length=32, index=True, null=False)

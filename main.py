@@ -1,12 +1,10 @@
 import uvicorn
 
-from config.create_app import create_app, init_db
+from config.create_app import create_app
 from config.routers import register_router
 from config.settings import HTTP_PORT
 
 app = create_app()
-
-init_db(app)
 
 register_router(app)
 

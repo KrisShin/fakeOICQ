@@ -10,7 +10,8 @@ from config.settings import ACCESS_TOKEN_EXPIRE_DAYS, ALGORITHM, SECRET_KEY
 from modules.common.exceptions import CredentialsException
 from modules.common.global_variable import oauth2_scheme
 from modules.common.utils import get_cache
-from modules.user.models import User
+from modules.communication.models import Communication
+from modules.user.models import ContactUser, User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -62,3 +63,15 @@ async def get_current_user_model(user_id: str = Depends(validate_token)):
 
     user = await User.get_or_none(id=user_id, disabled=False)
     return user
+
+
+async def add_to_contacts(user: User, contact: User):
+    if user.id == contact.id:
+        return False
+    communication = await Communication.create()
+    await ContactUser.create(
+        name=contact.nickname, me=user, contact=contact, communication=communication
+    )
+    await ContactUser.create(
+        name=user.nickname, me=contact, contact=user, communication=communication
+    )
