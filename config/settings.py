@@ -41,7 +41,7 @@ ACCESS_TOKEN_EXPIRE_DAYS = 7
 HTTP_ADDR = 'http://localhost'
 HTTP_PORT = 26798
 HTTP_SITE = f'{HTTP_ADDR}:{HTTP_PORT}'
-DEFAULT_AVATAR_PATH = f'/static/avatar'
+DEFAULT_AVATAR_PATH = f'static/avatar'
 
 
 class Router:

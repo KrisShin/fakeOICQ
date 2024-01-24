@@ -12,13 +12,15 @@ class BaseModel(models.Model):
         abstract = True
 
 
-class Tag(BaseModel):
+class Tag(models.Model):
     """
     The Tag model
     """
 
-    key = fields.CharField(max_length=128, null=False, unique=True, index=True)
+    key = fields.CharField(pk=True, max_length=128)
     description = fields.TextField(null=True)
+    create_time = fields.DatetimeField(auto_now_add=True)
+    update_time = fields.DatetimeField(auto_now=True)
 
     class Meta:
         table = "tb_tag"

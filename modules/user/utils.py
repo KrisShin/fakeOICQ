@@ -5,23 +5,25 @@ from uuid import UUID
 from fastapi import Depends
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from tortoise.expressions import Q
 
 from config.settings import ACCESS_TOKEN_EXPIRE_DAYS, ALGORITHM, SECRET_KEY
 from modules.common.exceptions import CredentialsException
 from modules.common.global_variable import oauth2_scheme
-from modules.common.utils import get_cache
+from modules.common.pydantics import UserOpration
+from modules.common.cache_ops import rcache
 from modules.communication.models import Communication
 from modules.user.models import ContactUser, User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str):
     """Check plain password whether right or not"""
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_password_hash(password):
+def get_password_hash(password: str):
     """Generate password hashed value."""
     return pwd_context.hash(password)
 
@@ -44,7 +46,7 @@ async def validate_token(token: str = Depends(oauth2_scheme)) -> str | bool:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("user_id")
         expire_time: float = payload.get('exp')
-        saved_token = await get_cache(user_id)
+        saved_token = await rcache.get_cache(user_id)
         if (
             (user_id is None)
             or (datetime.fromtimestamp(expire_time) < datetime.utcnow())
@@ -53,6 +55,13 @@ async def validate_token(token: str = Depends(oauth2_scheme)) -> str | bool:
             return False
     except JWTError:
         return False
+    login_failed_key = rcache.generate_user_operation_key(
+        user_id, UserOpration.LOGIN_FAILED
+    )
+    login_failed_times = await rcache.get_cache(login_failed_key)
+    if login_failed_times >= UserOpration.LOGIN_FAILED.value.limit:
+        return False
+    await rcache.set_cache(user_id, token, expire=ACCESS_TOKEN_EXPIRE_DAYS)
     return user_id
 
 
@@ -65,13 +74,30 @@ async def get_current_user_model(user_id: str = Depends(validate_token)):
     return user
 
 
-async def add_to_contacts(user: User, contact: User):
+async def add_to_contacts(user: User, contact: User, is_block: bool = False):
+    """
+    make two user become contact or blacklist.
+    """
     if user.id == contact.id:
         return False
     communication = await Communication.create()
     await ContactUser.create(
-        name=contact.nickname, me=user, contact=contact, communication=communication
+        name=contact.nickname,
+        me=user,
+        contact=contact,
+        communication=communication,
+        is_block=is_block,
     )
     await ContactUser.create(
-        name=user.nickname, me=contact, contact=user, communication=communication
+        name=user.nickname,
+        me=contact,
+        contact=user,
+        communication=communication,
+        is_block=is_block,
+    )
+
+
+async def get_relations(me: User, contact: User):
+    return await ContactUser.filter(
+        Q(Q(me=me, contact=contact), Q(me=contact, contact=me), join_type=Q.OR)
     )
