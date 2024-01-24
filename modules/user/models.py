@@ -1,4 +1,5 @@
 from enum import Enum
+import os
 
 from tortoise import fields
 
@@ -31,7 +32,7 @@ class User(BaseModel):
 
     @property
     def avatar_url(self):
-        return HTTP_SITE + DEFAULT_AVATAR_PATH + self.avatar
+        return os.path.join(os.path.join(HTTP_SITE, DEFAULT_AVATAR_PATH), self.avatar)
 
 
 class ContactUser(BaseModel):

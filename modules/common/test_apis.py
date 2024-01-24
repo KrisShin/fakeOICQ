@@ -20,6 +20,7 @@ async def prepare_tags():
     tags = []
     for t in [
         'cool',
+        'music',
         'beauty',
         'giao',
         'game',
@@ -29,7 +30,7 @@ async def prepare_tags():
         'finance',
         'geography',
     ]:
-        x = await Tag.create(key=t, description=t)
+        x = await Tag.create(key=t)
         tags.append(x)
     return Response()
 
