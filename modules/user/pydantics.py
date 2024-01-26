@@ -2,10 +2,11 @@ import os
 import re
 import string
 from typing import List
+
 from pydantic import BaseModel, field_validator
 from tortoise.contrib.pydantic import pydantic_model_creator
-from config.settings import BASE_DIR, DEBUG, DEFAULT_AVATAR_PATH
 
+from config.settings import BASE_DIR, DEBUG, DEFAULT_AVATAR_PATH
 from modules.user.models import ContactRequest, ContactUser, User
 
 UserPydantic = pydantic_model_creator(User, name="UserPydantic")

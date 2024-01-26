@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends
 from tortoise.expressions import Q
 
+from modules.common.cache_ops import rcache
 from modules.common.exceptions import BadRequest, NotFound, TooManyRequest
 from modules.common.global_variable import BaseResponse
 from modules.common.pydantics import UserOpration
-from modules.common.cache_ops import rcache
 from modules.common.utils import queryset_to_pydantic_model
+from modules.communication.pydantics import CommunicationPydantic
 from modules.user.models import (
     ContactRequest,
     ContactRequestTypeEnum,
@@ -119,7 +120,7 @@ async def post_contact_request(
         contact=contact,
         message=params.message,
     )
-    await rcache.incr_cache(me.id, UserOpration.ADD_CONTACT)
+    await rcache.limit_opt_cache(me.id, UserOpration.ADD_CONTACT)
     return BaseResponse()
 
 
@@ -247,3 +248,20 @@ async def put_contact_remark(
     contact.name = params.remark or user.nickname
     await contact.save()
     return BaseResponse()
+
+
+@router.get('/{contact_id}/')
+async def get_contact_info(contact_id: str, me: User = Depends(get_current_user_model)):
+    """
+    Get contact communication infomation.
+    """
+    contact = await ContactUser.get_or_none(id=contact_id).prefetch_related(
+        'communication'
+    )
+    resp = {
+        'contact': ContactUserInfoPydantic.model_validate(contact).model_dump(),
+        'communication': CommunicationPydantic.model_validate(
+            contact.communication
+        ).model_dump(),
+    }
+    return BaseResponse(data=resp)

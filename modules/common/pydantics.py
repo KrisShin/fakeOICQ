@@ -1,5 +1,7 @@
+from datetime import timedelta
 from enum import Enum, IntEnum
 from typing import Tuple
+
 from tortoise.contrib.pydantic import pydantic_model_creator
 
 from modules.common.models import Tag
@@ -12,13 +14,13 @@ TagPydantic = pydantic_model_creator(
 class _OptionType:
     code: int
     limit: int  # limit times
-    expire: int  # seconds
+    expire: timedelta  # seconds
 
     def __init__(self, code, limit, expire) -> None:
         super().__init__()
         self.code = code
         self.limit = limit
-        self.expire = expire
+        self.expire = timedelta(seconds=expire)
 
 
 class UserOpration(Enum):
