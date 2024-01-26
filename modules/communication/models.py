@@ -26,7 +26,7 @@ class Message(BaseModel):
     content = fields.TextField()
     # status = fields.IntField(default=0)  # 0未读 1已读
     message_category = fields.IntEnumField(
-        enum_type=MessageType, default=MessageType.TEXT.value
+        enum_type=MessageType, default=MessageType.TEXT
     )
 
     contact_id = fields.CharField(max_length=32, index=True, null=False)
@@ -34,6 +34,7 @@ class Message(BaseModel):
 
     class Meta:
         table = 'tb_message'
+        ordering = ["-create_time"]
 
     def __str__(self):
         return self.title
@@ -49,7 +50,7 @@ class Communication(BaseModel):
     new_count = fields.IntField(default=0)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-create_time']
         table = 'tb_communication'
 
     @property

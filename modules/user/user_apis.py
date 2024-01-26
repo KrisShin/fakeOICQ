@@ -4,14 +4,12 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from config.settings import ACCESS_TOKEN_EXPIRE_DAYS
+from modules.common.cache_ops import rcache
 from modules.common.exceptions import AuthenticationFailed, BadRequest, TooManyRequest
 from modules.common.global_variable import BaseResponse
 from modules.common.models import Tag
 from modules.common.pydantics import TagPydantic, UserOpration
-from modules.common.cache_ops import rcache
-from modules.common.utils import (
-    queryset_to_pydantic_model,
-)
+from modules.common.utils import queryset_to_pydantic_model
 from modules.user.models import ContactUser, User
 from modules.user.pydantics import (
     ContactUserInfoPydantic,
@@ -80,12 +78,12 @@ async def post_token(user: OAuth2PasswordRequestForm = Depends()):
     if not user_obj or (user and user_obj.disabled):
         raise AuthenticationFailed('Username exist.')
     if not verify_password(user.password, user_obj.password):
-        await rcache.incr_cache(user_obj.id, UserOpration.LOGIN_FAILED)
+        await rcache.limit_opt_cache(user_obj.id, UserOpration.LOGIN_FAILED)
         raise AuthenticationFailed('Wrong password')
-    access_token_expires = timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
-    token = create_access_token(user_id=user_obj.id, expires_delta=access_token_expires)
-    await rcache.del_cache(str(user_obj.id))
-    await rcache.set_cache(str(user_obj.id), token, access_token_expires)
+    token = create_access_token(user_id=user_obj.id)
+    await rcache.set_cache(
+        str(user_obj.id), token, timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+    )
     return TokenPydantic(access_token=token)
 
 
@@ -141,7 +139,7 @@ async def put_edit_my_info(
     user_base_info['tags'] = queryset_to_pydantic_model(
         await me.tags.all(), TagPydantic
     )
-    await rcache.incr_cache(me.id, UserOpration.EDIT_INFO)
+    await rcache.limit_opt_cache(me.id, UserOpration.EDIT_INFO)
     return BaseResponse(data=user_base_info)
 
 
@@ -167,5 +165,5 @@ async def post_edit_password(
         await me.save()
         rcache.del_cache(me.id)
         return BaseResponse()
-    await rcache.incr_cache(me.id, UserOpration.LOGIN_FAILED)
+    await rcache.limit_opt_cache(me.id, UserOpration.LOGIN_FAILED)
     raise AuthenticationFailed('Wrong password.')

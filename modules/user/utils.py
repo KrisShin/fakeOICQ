@@ -8,10 +8,10 @@ from passlib.context import CryptContext
 from tortoise.expressions import Q
 
 from config.settings import ACCESS_TOKEN_EXPIRE_DAYS, ALGORITHM, SECRET_KEY
+from modules.common.cache_ops import rcache
 from modules.common.exceptions import CredentialsException
 from modules.common.global_variable import oauth2_scheme
 from modules.common.pydantics import UserOpration
-from modules.common.cache_ops import rcache
 from modules.communication.models import Communication
 from modules.user.models import ContactUser, User
 
@@ -59,9 +59,12 @@ async def validate_token(token: str = Depends(oauth2_scheme)) -> str | bool:
         user_id, UserOpration.LOGIN_FAILED
     )
     login_failed_times = await rcache.get_cache(login_failed_key)
-    if login_failed_times >= UserOpration.LOGIN_FAILED.value.limit:
+    if (
+        login_failed_times
+        and login_failed_times >= UserOpration.LOGIN_FAILED.value.limit
+    ):
         return False
-    await rcache.set_cache(user_id, token, expire=ACCESS_TOKEN_EXPIRE_DAYS)
+    await rcache.expire_cache(user_id, ex=timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS))
     return user_id
 
 
