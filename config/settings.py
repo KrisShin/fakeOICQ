@@ -31,6 +31,11 @@ REDIS_DB = env('REDIS_DB')
 REDIS_URL = f"redis://{REDIS_USER}:{REDIS_PASS}@{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
 CACHE_HEADER = 'oicq.cache.'
 
+# broker
+rabbit_schema = env('RABBIT_SCHEMA', default='amqps')
+rabbit_vhost = env('RABBIT_VHOST', default='/')
+# rabbit_vhost = '/'
+MQ_BROKER = f"{rabbit_schema}://{env('RABBIT_USER')}:{env('RABBIT_PASS')}@{env('RABBIT_HOST')}:{env('RABBIT_PORT')}/{rabbit_vhost}"
 
 # to get a string like this run:
 # openssl rand -hex 32

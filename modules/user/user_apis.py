@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from config.settings import ACCESS_TOKEN_EXPIRE_DAYS
-from modules.common.cache_ops import rcache
+from modules.common.redis_client import cache_client
 from modules.common.exceptions import AuthenticationFailed, BadRequest, TooManyRequest
 from modules.common.global_variable import BaseResponse
 from modules.common.models import Tag
@@ -78,10 +78,10 @@ async def post_token(user: OAuth2PasswordRequestForm = Depends()):
     if not user_obj or (user and user_obj.disabled):
         raise AuthenticationFailed('Username exist.')
     if not verify_password(user.password, user_obj.password):
-        await rcache.limit_opt_cache(user_obj.id, UserOpration.LOGIN_FAILED)
+        await cache_client.limit_opt_cache(user_obj.id, UserOpration.LOGIN_FAILED)
         raise AuthenticationFailed('Wrong password')
     token = create_access_token(user_id=user_obj.id)
-    await rcache.set_cache(
+    await cache_client.set_cache(
         str(user_obj.id), token, timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
     )
     return TokenPydantic(access_token=token)
@@ -122,7 +122,7 @@ async def put_edit_my_info(
         email: str.
         tags: list[str].
     """
-    times = await rcache.get_cache(me.id, UserOpration.EDIT_INFO)
+    times = await cache_client.get_cache(me.id, UserOpration.EDIT_INFO)
     if times > UserOpration.EDIT_INFO.value.limit:
         raise TooManyRequest('Request limited.')
     exclude_fields = ['tags']
@@ -139,7 +139,7 @@ async def put_edit_my_info(
     user_base_info['tags'] = queryset_to_pydantic_model(
         await me.tags.all(), TagPydantic
     )
-    await rcache.limit_opt_cache(me.id, UserOpration.EDIT_INFO)
+    await cache_client.limit_opt_cache(me.id, UserOpration.EDIT_INFO)
     return BaseResponse(data=user_base_info)
 
 
@@ -157,13 +157,13 @@ async def post_edit_password(
     if verify_password(params.old_password, me.password):
         if verify_password(params.new_password, me.password):
             raise BadRequest('new password is same as old password')
-        times = await rcache.get_cache(me.id, UserOpration.EDIT_PASSWORD)
+        times = await cache_client.get_cache(me.id, UserOpration.EDIT_PASSWORD)
         if times > UserOpration.EDIT_PASSWORD.value.limit:
             raise TooManyRequest('Request limited.')
         password_hash = get_password_hash(params.new_password)
         me.password = password_hash
         await me.save()
-        rcache.del_cache(me.id)
+        cache_client.del_cache(me.id)
         return BaseResponse()
-    await rcache.limit_opt_cache(me.id, UserOpration.LOGIN_FAILED)
+    await cache_client.limit_opt_cache(me.id, UserOpration.LOGIN_FAILED)
     raise AuthenticationFailed('Wrong password.')
