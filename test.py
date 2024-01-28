@@ -1,37 +1,38 @@
 import asyncio
-import aiohttp
 import aio_pika
 
-async def connect_to_rabbitmq():
-    connection = await aio_pika.connect_robust("amqp://guest:guest@localhost/")
-    channel = await connection.channel()
-    return channel, connection
-
-async def handle_websocket_messages(websocket_url, rabbit_channel):
-    async with aiohttp.ClientSession() as session:
-        async with session.ws_connect(websocket_url) as ws:
-            while True:
-                msg = await ws.receive()
-                if msg.type == aiohttp.WSMsgType.TEXT:
-                    data = msg.data
-                    routing_key = "your_routing_key"
-                    message = aio_pika.Message(body=data.encode())
-
-                    await rabbit_channel.default_exchange.publish(
-                        message,
-                        routing_key=routing_key,
-                    )
-                    print(f"Sent to RabbitMQ: {data}")
 
 async def main():
-    rabbit_channel, rabbit_connection = await connect_to_rabbitmq()
-    try:
-        websocket_url = "ws://your-websocket-server-url"
-        await handle_websocket_messages(websocket_url, rabbit_channel)
-    except Exception as e:
-        print(f"Error occurred: {e}")
-    finally:
-        await rabbit_connection.close()
+    # 建立连接
+    connection = await aio_pika.connect_robust(
+        "amqp://oicquser:oicqpwd@localhost:56372/oicqmq"
+    )
+
+    # 创建通道
+    channel = await connection.channel()
+
+    # 声明队列，假设我们监听名为'example_queue'的队列，并且设置其为持久化
+    queue = await channel.declare_queue('your_routing_key', durable=True)
+
+    # 设置消息处理回调函数
+    async def process_message(message: aio_pika.IncomingMessage):
+        print(f"Received message: {message.body.decode()}")
+        # 手动应答确认消息被正确处理
+        await message.ack()
+
+    # 开始消费消息
+    await queue.consume(process_message)
+
+    # 保持应用运行以持续监听消息
+    print("Awaiting messages...")
+    await asyncio.Future()
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(main())
+    except KeyboardInterrupt:
+        pass
+    finally:
+        loop.close()
