@@ -5,7 +5,7 @@ import aio_pika
 async def main():
     # 建立连接
     connection = await aio_pika.connect_robust(
-        "amqp://oicquser:oicqpwd@localhost:56372/oicqmq"
+        "pyamqp://oicquser:oicqpwd@localhost:56372/oicqmq"
     )
 
     # 创建通道

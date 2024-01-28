@@ -1,6 +1,7 @@
 from datetime import timedelta
 import aio_pika
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from config.settings import MQ_BROKER
 
 from modules.common.redis_client import cache_client
 
@@ -9,7 +10,7 @@ router = APIRouter()
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    connection = await aio_pika.connect_robust("amqp://oicquser:oicqpwd@localhost:56372/oicqmq")
+    connection = await aio_pika.connect_robust(MQ_BROKER)
     channel = await connection.channel()
 
     await websocket.accept()
@@ -29,7 +30,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 await channel.default_exchange.publish(message, routing_key=routing_key)
                 # 向前端发送消息
                 await websocket.send_text('pong')
-            # raise WebSocketDisconnect
+            else:
+                raise WebSocketDisconnect
         except WebSocketDisconnect:
             print('websocket close')
             await cache_client.del_cache(f'{user_id}.alive')
