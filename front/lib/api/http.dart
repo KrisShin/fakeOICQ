@@ -1,60 +1,83 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart'; // 引入fluttertoast
 
-class HttpRequest {
-  late String baseUrl;
+class HttpService {
+  static const String _baseUrl = "http://8.137.53.219:26798";
 
-  HttpRequest() {
-    // 设置默认的baseUrl
-    this.baseUrl = "http://8.137.53.219:26798";
-  }
+  // GET请求
+  static Future<dynamic> get(String path,
+      {Map<String, dynamic>? queryParameters}) async {
+    final queryParams = queryParameters != null
+        ? queryParameters.entries.map((e) => '${e.key}=${e.value}').join('&')
+        : '';
 
-  // HttpRequest(this.baseUrl);
+    final url = Uri.parse('$_baseUrl/$path?$queryParams');
 
-  // 发送GET请求
-  Future<Map<String, dynamic>> getRequest(String endpoint) async {
-    var response = await http.get(Uri.parse('$baseUrl$endpoint'));
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to load data');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(
+            'Failed to load data with status code: ${response.statusCode}');
+      }
+    } on Exception catch (e) {
+      print('Error: $e');
+      rethrow;
     }
   }
 
-//发送POST请求
-  Future<Map<String, dynamic>> post(String endpoint, Map<String, dynamic> body,
+  // POST请求
+  static Future<dynamic> post(String path, dynamic body,
       {Map<String, String>? headers}) async {
-    print('$baseUrl$endpoint');
-    var response = await http.post(
-      Uri.parse('$baseUrl$endpoint'),
-      body: body,
-      headers: headers,
-    );
-    print(response.statusCode.toString());
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to post data');
+    final url = Uri.parse('$_baseUrl$path');
+
+    Map<String, String> mergedHeaders = {
+      'Content-Type': 'application/json',
+    };
+
+    if (headers != null) mergedHeaders.addAll(headers);
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(body), headers: headers);
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(
+            'Failed to post data with status code: ${response.statusCode}');
+      }
+    } on Exception catch (e) {
+      print('Error: $e');
+      rethrow;
     }
   }
 
-// 发送JSON格式的POST请求
-  Future<Map<String, dynamic>> postRequestJson(
-      String endpoint, Map<String, dynamic> body) async {
-    print('$baseUrl$endpoint');
-    var response = await http.post(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(body),
-    );
-    print(response.statusCode.toString());
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to post data');
+  // POST Form
+  static Future<dynamic> postForm(String path, dynamic body,
+      {Map<String, String>? headers}) async {
+    final url = Uri.parse('$_baseUrl$path');
+    print(url);
+    try {
+      final response = await http.post(url, body: body, headers: headers);
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(
+            'Failed to post data with status code: ${response.statusCode}');
+      }
+    } on Exception catch (e) {
+      print('Error: $e');
+      Fluttertoast.showToast(
+        msg: "登录失败，请检查网络或输入信息",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        // backgroundColor: Colors.red,
+        // textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
   }
 }

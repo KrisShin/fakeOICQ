@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 import 'api/http.dart';
 
 class LoginPage extends StatelessWidget {
@@ -11,11 +11,19 @@ class LoginPage extends StatelessWidget {
     String password = passwordController.text;
 
     // 发起POST请求
-    HttpRequest login = HttpRequest();
-    login.post('/api/user/token/', {
+    var response = await HttpService.postForm('/api/user/token/', {
       'username': username,
       'password': password,
-    }).then((value) => {print(value), Navigator.pushNamed(context, "/home")});
+    });
+    // .then((value) => {print(value), Navigator.pushNamed(context, "/home")});
+    print("response: $response");
+
+    if (response) {
+      print("登录成功");
+      Navigator.pushNamed(context, "/home");
+    } else {
+      print("登录失败");
+    }
   }
 
   @override
