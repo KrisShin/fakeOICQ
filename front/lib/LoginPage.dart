@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 // import 'package:http/http.dart' as http;
 import 'api/http.dart';
+// import 'package:fluttertoast/fluttertoast.dart';
+import 'package:tdesign_flutter/tdesign_flutter.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
@@ -18,9 +20,19 @@ class LoginPage extends StatelessWidget {
     // .then((value) => {print(value), Navigator.pushNamed(context, "/home")});
     print("response: $response");
 
-    if (response) {
+    if (response != null) {
       print("登录成功");
       Navigator.pushNamed(context, "/home");
+      // Fluttertoast.showToast(
+      //     msg: "This is Center Short Toast",
+      //     toastLength: Toast.LENGTH_SHORT,
+      //     gravity: ToastGravity.CENTER,
+      //     timeInSecForIosWeb: 1,
+      //     backgroundColor: Colors.red,
+      //     textColor: Colors.white,
+      //     fontSize: 16.0);
+
+      // TDToast.showText('最多一行展示十个汉字宽度限制最多不超过三行文字', context: context);
     } else {
       print("登录失败");
     }

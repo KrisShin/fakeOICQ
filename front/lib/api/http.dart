@@ -1,6 +1,5 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:fluttertoast/fluttertoast.dart'; // 引入fluttertoast
 
 class HttpService {
   static const String _baseUrl = "http://8.137.53.219:26798";
@@ -69,15 +68,6 @@ class HttpService {
       }
     } on Exception catch (e) {
       print('Error: $e');
-      Fluttertoast.showToast(
-        msg: "登录失败，请检查网络或输入信息",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        // backgroundColor: Colors.red,
-        // textColor: Colors.white,
-        fontSize: 16.0,
-      );
     }
   }
 }
