@@ -4,10 +4,10 @@ from tortoise import Tortoise
 from modules.user.contact_apis import router as contact_router
 from modules.user.user_apis import router as user_router
 from modules.communication.apis import router as communication_router
+from modules.common.apis import router as common_router
 
 
 # from modules.common.test_apis import router as test_router
-# from modules.common.apis import router as tag_router
 
 
 def register_router(app: FastAPI):
@@ -36,6 +36,12 @@ def register_router(app: FastAPI):
     #     responses={404: {'description': 'Not Found'}},
     #     prefix="/api/tag",
     # )
+    app.include_router(
+        common_router,
+        tags=['common'],
+        responses={404: {'description': 'Not Found'}},
+        prefix='/api/common',
+    )
     app.include_router(
         user_router,
         tags=['user'],

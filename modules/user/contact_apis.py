@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from tortoise.expressions import Q
 
-from modules.common.cache_ops import rcache
+from modules.common.redis_client import cache_client
 from modules.common.exceptions import BadRequest, NotFound, TooManyRequest
 from modules.common.global_variable import BaseResponse
 from modules.common.pydantics import UserOpration
@@ -100,7 +100,7 @@ async def post_contact_request(
         contact_id: id of user who be searched.
         message: str
     """
-    times = await rcache.get_cache(me.id, UserOpration.ADD_CONTACT)
+    times = await cache_client.get_cache(me.id, UserOpration.ADD_CONTACT)
     if times > UserOpration.EDIT_PASSWORD.value.limit:
         raise TooManyRequest('Request limited.')
     contact = await User.get_or_none(id=params.id)
@@ -120,7 +120,7 @@ async def post_contact_request(
         contact=contact,
         message=params.message,
     )
-    await rcache.limit_opt_cache(me.id, UserOpration.ADD_CONTACT)
+    await cache_client.limit_opt_cache(me.id, UserOpration.ADD_CONTACT)
     return BaseResponse()
 
 

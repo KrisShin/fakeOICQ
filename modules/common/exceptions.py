@@ -1,11 +1,5 @@
 from fastapi import HTTPException, status
 
-CredentialsException = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="Could not validate credentials",
-    headers={"WWW-Authenticate": "Bearer"},
-)
-
 
 class BadRequest(HTTPException):
     status_code = status.HTTP_400_BAD_REQUEST
@@ -22,6 +16,7 @@ class NotFound(HTTPException):
     def __init__(self, detail):
         self.detail = [{'msg': detail}]
 
+
 class TooManyRequest(HTTPException):
     status_code = status.HTTP_429_TOO_MANY_REQUESTS
     detail = ''
@@ -30,9 +25,10 @@ class TooManyRequest(HTTPException):
         self.detail = [{'msg': detail}]
 
 
-class AuthenticationFailed(HTTPException):
+class AuthorizationFailed(HTTPException):
     status_code = status.HTTP_401_UNAUTHORIZED
-    detail = ''
+    detail = ""
+    headers = {"WWW-Authenticate": "Bearer"}
 
-    def __init__(self, detail):
+    def __init__(self, detail="Could not validate credentials"):
         self.detail = [{'msg': detail}]

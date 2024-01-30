@@ -74,4 +74,4 @@ class RedisCache:
         return f"{user_id}.{operation_type.value.code}"
 
 
-rcache = RedisCache()
+cache_client = RedisCache()

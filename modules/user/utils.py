@@ -8,8 +8,8 @@ from passlib.context import CryptContext
 from tortoise.expressions import Q
 
 from config.settings import ACCESS_TOKEN_EXPIRE_DAYS, ALGORITHM, SECRET_KEY
-from modules.common.cache_ops import rcache
-from modules.common.exceptions import CredentialsException
+from modules.common.redis_client import cache_client
+from modules.common.exceptions import AuthorizationFailed
 from modules.common.global_variable import oauth2_scheme
 from modules.common.pydantics import UserOpration
 from modules.communication.models import Communication
@@ -46,7 +46,7 @@ async def validate_token(token: str = Depends(oauth2_scheme)) -> str | bool:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("user_id")
         expire_time: float = payload.get('exp')
-        saved_token = await rcache.get_cache(user_id)
+        saved_token = await cache_client.get_cache(user_id)
         if (
             (user_id is None)
             or (datetime.fromtimestamp(expire_time) < datetime.utcnow())
@@ -55,23 +55,29 @@ async def validate_token(token: str = Depends(oauth2_scheme)) -> str | bool:
             return False
     except JWTError:
         return False
-    login_failed_key = rcache.generate_user_operation_key(
+    return user_id
+
+
+async def check_login_failed_cache(user_id: str):
+    login_failed_key = cache_client.generate_user_operation_key(
         user_id, UserOpration.LOGIN_FAILED
     )
-    login_failed_times = await rcache.get_cache(login_failed_key)
+    login_failed_times = await cache_client.get_cache(login_failed_key)
     if (
         login_failed_times
         and login_failed_times >= UserOpration.LOGIN_FAILED.value.limit
     ):
-        return False
-    await rcache.expire_cache(user_id, ex=timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS))
-    return user_id
+        raise AuthorizationFailed()
+    await cache_client.expire_cache(
+        user_id, ex=timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+    )
 
 
 async def get_current_user_model(user_id: str = Depends(validate_token)):
     """return user orm"""
     if user_id is False:
-        raise CredentialsException
+        raise AuthorizationFailed()
+    await check_login_failed_cache(user_id)
 
     user = await User.get_or_none(id=user_id, disabled=False)
     return user

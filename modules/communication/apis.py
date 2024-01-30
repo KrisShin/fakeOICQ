@@ -8,31 +8,10 @@ from modules.communication.pydantics import MessageParamPydantic, MessagePydanti
 from modules.user.models import ContactUser, User
 
 from modules.user.utils import get_current_user_model
-from modules.common.cache_ops import rcache
-from config.create_app import app
+from modules.common.redis_client import cache_client
 
 
 router = APIRouter()
-
-
-@router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-
-    while True:
-        try:
-            user_id = await websocket.receive_text()
-            if user_id.startswith('ping.'):
-                await rcache.set_cache(
-                    f'{user_id}.alive', True, ex=timedelta(minutes=5)
-                )
-
-                # 向前端发送消息
-                await websocket.send_text('pong')
-            raise WebSocketDisconnect
-        except WebSocketDisconnect:
-            await rcache.del_cache(f'{user_id}.alive')
-            break
 
 
 @router.post("/message/")
@@ -62,14 +41,13 @@ async def get_messages(
     """
     Get messages from communication.
     """
-    # ...
     commuincation = await Communication.get_or_none(
         id=communication_id
     ).prefetch_related('contact_users')
     if not commuincation:
         raise NotFound('Communication not found')
     contact_user = await commuincation.contact_users[0]
-    
+
     await contact_user.fetch_related('me', 'contact')
 
     if me not in (contact_user.me, contact_user.contact):
