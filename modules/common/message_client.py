@@ -1,4 +1,5 @@
 from typing import Dict
+
 import aio_pika
 from fastapi import WebSocket
 

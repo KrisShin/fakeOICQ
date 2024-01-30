@@ -8,10 +8,10 @@ from passlib.context import CryptContext
 from tortoise.expressions import Q
 
 from config.settings import ACCESS_TOKEN_EXPIRE_DAYS, ALGORITHM, SECRET_KEY
-from modules.common.redis_client import cache_client
 from modules.common.exceptions import AuthorizationFailed
 from modules.common.global_variable import oauth2_scheme
 from modules.common.pydantics import UserOpration
+from modules.common.redis_client import cache_client
 from modules.communication.models import Communication
 from modules.user.models import ContactUser, User
 

@@ -1,7 +1,7 @@
 from pydantic import BaseModel
+from tortoise.contrib.pydantic import pydantic_model_creator
 
 from modules.communication.models import Communication, Message, MessageType
-from tortoise.contrib.pydantic import pydantic_model_creator
 
 
 class MessageParamPydantic(BaseModel):

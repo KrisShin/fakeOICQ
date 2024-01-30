@@ -4,11 +4,11 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from config.settings import ACCESS_TOKEN_EXPIRE_DAYS
-from modules.common.redis_client import cache_client
 from modules.common.exceptions import BadRequest, TooManyRequest
 from modules.common.global_variable import BaseResponse
 from modules.common.models import Tag
 from modules.common.pydantics import TagPydantic, UserOpration
+from modules.common.redis_client import cache_client
 from modules.common.utils import queryset_to_pydantic_model
 from modules.user.models import ContactUser, User
 from modules.user.pydantics import (
