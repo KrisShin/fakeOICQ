@@ -36,8 +36,8 @@ async def websocket_endpoint(websocket: WebSocket):
             msg = await websocket.receive_text()
             if msg.startswith('msg.'):
                 msg = msg[4:]
-                # msg_dict = json.loads(msg)
-                # await Message.create(**msg_dict)
+                msg_dict = json.loads(msg)
+                await Message.create(**msg_dict)
                 # await cache_client.expire_cache(f'{user_id}.alive', ex=timedelta(minutes=5))
                 await msg_client.send(msg, routing_key=communication_id)
                 # await websocket.send_text('send success')
